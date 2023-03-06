@@ -1,0 +1,28 @@
+select 모델 = (select 함수가 핵심이 되는)
+소켓 함수 호출이 성공할 시점을 미리 알 수 있다.
+문제상황)
+수신버퍼에 데이터가 없는데 read한다거나
+송싱버퍼가 꽉 찻느데 write 한다거나
+블로킹 소켓 : 조건이 만족되지 않아서 블로킹되는 상황 예방
+논블로킹 소켓 : 조건이 만족되지 않아서 불필요하게 반복 체크하는 상황을 예방
+
+socket set
+1) 읽기[1 2 3] 쓰기[] 예외[] 관찰 대상 등록
+// OutOfBand는 send()의 마지막 인자 로 보내는 특별한 데이터
+// 받는 쪽에서도 recv 세팅을 해야 읽을 수 있음
+2) select(readSet,WriteSet,exceptSet,timevalue) -> 관찰 시작
+3) 적어도 하나의 소켓이 준비되면 리턴 -> 낙오자는 알아서 제거됨
+4) 남은 소켓 체크해서 진행
+5) 마지막인자는 대기 시간
+time val tiemout;
+timeout.tv.sec;
+timeout.tv_usec;
+nullptr -> 무한대기
+fd_set read;
+FD_ZERO : 비운다
+ex) FD_ZERO(&set);
+FD_SET 소켓 s를 넣는다.
+ex) FD_SET(s,&set);
+FD_CLR 소켓 s를 제거
+ex) FD_CLT(s,&set);
+FD_ISSET 소켓 s가 set에 들어왔으면 0이 아닌 값을 리턴한다
